@@ -1,0 +1,12 @@
+.idea
+__pycache__/
+*.py[cod]
+.DS_Store
+nginx/logs
+venv
+.venv/
+.vscode/
+.ruff_cache/
+.mypy_cache/
+.env
+.pytest_cache/

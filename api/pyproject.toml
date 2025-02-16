@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "api"
+version = "0.1.0"
+description = ""
+authors = ["vtitoff <v.titoff2010@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["standard"], version = "^0.115.8"}
+asyncpg = "^0.30.0"
+alembic = "^1.14.1"
+black = "^25.1.0"
+isort = "^6.0.0"
+pydantic-settings = "^2.7.1"
+sqlalchemy = "^2.0.38"
+uvicorn = "^0.34.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
