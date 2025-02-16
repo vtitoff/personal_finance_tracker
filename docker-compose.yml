@@ -1,17 +1,17 @@
 services:
-  finance_api:
+  finance_app:
     build:
       dockerfile: Dockerfile
-      context: ./api
-    container_name: api
+      context: ./app
+    container_name: app
     env_file:
-      - api/src/.env
+      - app/src/.env
     restart: always
     networks:
-      - finance_api_network
+      - finance_app_network
     volumes:
-      - ./api/src:/opt/app/src
-      - ./api/logs/:/var/log/app/
+      - ./app/src:/opt/app/src
+      - ./app/logs/:/var/log/app/
     depends_on:
       postgres:
         condition: service_healthy
@@ -27,11 +27,11 @@ services:
       - ./nginx/site.conf:/etc/nginx/conf.d/site.conf
       - ./nginx/logs/:/var/log/nginx/
     depends_on:
-      - finance_api
+      - finance_app
     ports:
       - "80:80"
     networks:
-      - finance_api_network
+      - finance_app_network
 
   postgres:
     image: postgres:16
@@ -39,7 +39,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
-    env_file: api/src/.env
+    env_file: app/src/.env
     ports:
       - "127.0.0.1:5432:5432"
     healthcheck:
@@ -48,10 +48,10 @@ services:
       timeout: 10s
       retries: 5
     networks:
-      - finance_api_network
+      - finance_app_network
 
 networks:
-  finance_api_network:
+  finance_app_network:
 
 volumes:
   postgres_data:
