@@ -1,14 +1,14 @@
 import enum
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
-from sqlalchemy import (BigInteger, ForeignKey, String, Text,
-                        func)
+from sqlalchemy import BigInteger, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import ENUM, TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import (DeclarativeBase, Mapped, mapped_column,
+                            relationship, validates)
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from models.sqlalchemy_utils.email import EmailType
@@ -65,6 +65,18 @@ class Payment(Base):
     payment_method: Mapped[List["PaymentMethod"]] = relationship(
         back_populates="paymentmethods"
     )
+
+    @validates("date")
+    def validate_date(self, key, value):
+        if value.tzinfo is None:
+            raise ValueError("Date must contain time zone")
+
+        utc_time = value.astimezone(timezone.utc)
+        current_utc = datetime.now(timezone.utc)
+
+        if utc_time > current_utc.now(timezone.utc):
+            raise ValueError("Date cannot be less than current date")
+        return value
 
 
 class PaymentCategory(Base):
