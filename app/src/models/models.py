@@ -69,14 +69,20 @@ class Payment(Base):
     @validates("date")
     def validate_date(self, key, value):
         if value.tzinfo is None:
-            raise ValueError("Date must contain time zone")
+            raise ValueError("Date must contain time zone.")
 
         utc_time = value.astimezone(timezone.utc)
         current_utc = datetime.now(timezone.utc)
 
         if utc_time > current_utc.now(timezone.utc):
-            raise ValueError("Date cannot be less than current date")
+            raise ValueError("Date cannot be less than current date.")
         return value
+
+    @validates("amount")
+    def validate_amount(self, key, amount):
+        if amount <= 0:
+            raise ValueError("Amount must be a positive number.")
+        return amount
 
 
 class PaymentCategory(Base):
