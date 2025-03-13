@@ -3,9 +3,11 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+from fastapi_pagination import add_pagination
 from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
                                     create_async_engine)
 
+from api.v1.categories import router as categories_router
 from core.config import settings
 from db import postgres
 
@@ -27,6 +29,9 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 
+app.include_router(categories_router, prefix="/api/v1", tags=["categories"])
+
+add_pagination(app)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8080, reload=True)

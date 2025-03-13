@@ -56,14 +56,8 @@ class Payment(Base):
     category_id: Mapped[uuid.UUID] = mapped_column(
         PgUUID, ForeignKey("paymentcategory.id")
     )
-    category: Mapped[List["PaymentCategory"]] = relationship(
-        back_populates="paymentcategories"
-    )
     payment_method_id: Mapped[uuid.UUID] = mapped_column(
         PgUUID, ForeignKey("paymentmethod.id")
-    )
-    payment_method: Mapped[List["PaymentMethod"]] = relationship(
-        back_populates="paymentmethods"
     )
 
     @validates("date")
