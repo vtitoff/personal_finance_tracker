@@ -10,8 +10,8 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
-import models
 
+import models
 from alembic import op
 
 # revision identifiers, used by Alembic.

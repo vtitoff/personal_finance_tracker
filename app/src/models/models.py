@@ -86,7 +86,7 @@ class Payment(Base):
 
 
 class PaymentCategory(Base):
-    name: Mapped[str] = mapped_column(String)
+    name: Mapped[str] = mapped_column(String, unique=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
 
 
