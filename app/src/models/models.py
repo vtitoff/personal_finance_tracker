@@ -54,10 +54,10 @@ class Payment(Base):
         TIMESTAMP(timezone=True), server_default=func.current_timestamp()
     )
     category_id: Mapped[uuid.UUID] = mapped_column(
-        PgUUID, ForeignKey("paymentcategory.id")
+        PgUUID, ForeignKey("paymentcategory.id", ondelete="SET NULL")
     )
     payment_method_id: Mapped[uuid.UUID] = mapped_column(
-        PgUUID, ForeignKey("paymentmethod.id")
+        PgUUID, ForeignKey("paymentmethod.id", ondelete="SET NULL")
     )
 
     @validates("date")
