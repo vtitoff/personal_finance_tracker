@@ -1,4 +1,5 @@
 from functools import lru_cache
+from uuid import UUID
 
 from fastapi import Depends
 from sqlalchemy import select
@@ -35,8 +36,10 @@ class CategoryService:
             categories_data = await session.scalars(select(PaymentCategory))
             return categories_data.all()
 
+    async def delete_category(self, category_id: UUID):
+        pass
 
-@lru_cache()
+
 def get_category_service(
     postgres_session: AsyncSession = Depends(get_postgres_session),
 ) -> CategoryService:

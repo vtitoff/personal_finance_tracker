@@ -28,5 +28,5 @@ async def create_categories(
     except ObjectAlreadyExistsException:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Category with title {category.name} already exists",
+            detail=f"Category with name {category.name} already exists",
         )
