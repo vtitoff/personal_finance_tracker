@@ -17,11 +17,11 @@ async def get_categories(
     return paginate(categories)
 
 
-@router.post("/categories", response_model=dict)
+@router.post("/categories", response_model=GetPaymentCategorySchema)
 async def create_categories(
     category: CreatePaymentCategorySchema,
     category_service: CategoryService = Depends(get_category_service),
-):
+) -> GetPaymentCategorySchema:
     try:
         category = await category_service.create_category(category)
         return category
