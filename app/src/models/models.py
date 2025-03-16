@@ -94,6 +94,7 @@ class PaymentMethod(Base):
             name="currency",
         )
     )
+    user_id: Mapped[uuid.UUID] = mapped_column(PgUUID, ForeignKey("user.id"))
 
 
 class User(Base):
