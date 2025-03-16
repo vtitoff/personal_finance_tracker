@@ -1,15 +1,15 @@
 from functools import lru_cache
 from uuid import UUID
 
+from db.postgres import get_postgres_session
 from fastapi import Depends
+from models.models import PaymentCategory
+from schemas.payment_category import CreatePaymentCategorySchema
+from services.exceptions import (ObjectAlreadyExistsException,
+                                 ObjectNotFoundError)
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from db.postgres import get_postgres_session
-from models.models import PaymentCategory
-from schemas.payment_category import CreatePaymentCategorySchema
-from services.exceptions import ObjectAlreadyExistsException
 
 
 class CategoryService:
@@ -37,7 +37,17 @@ class CategoryService:
             return categories_data.all()
 
     async def delete_category(self, category_id: UUID):
-        pass
+        async with self.postgres_session() as session:
+            categories_data = await session.scalars(
+                select(PaymentCategory).filter_by(id=category_id)
+            )
+            category = categories_data.first()
+
+            if category is None:
+                raise ObjectNotFoundError("Category not found")
+
+            await session.delete(category)
+            await session.commit()
 
 
 def get_category_service(

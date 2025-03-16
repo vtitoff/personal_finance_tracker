@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import List
 
+from models.sqlalchemy_utils.email import EmailType
 from sqlalchemy import BigInteger, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import ENUM, TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID as PgUUID
@@ -10,8 +11,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import (DeclarativeBase, Mapped, mapped_column,
                             relationship, validates)
 from werkzeug.security import check_password_hash, generate_password_hash
-
-from models.sqlalchemy_utils.email import EmailType
 
 
 class CurrencyEnum(enum.Enum):

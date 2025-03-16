@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_pagination import Page, paginate
-
 from schemas.payment_category import (CreatePaymentCategorySchema,
                                       GetPaymentCategorySchema)
 from services.category_service import CategoryService, get_category_service
-from services.exceptions import ObjectAlreadyExistsException
+from services.exceptions import (ObjectAlreadyExistsException,
+                                 ObjectNotFoundError)
 
 router = APIRouter()
 
@@ -30,3 +30,18 @@ async def create_categories(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Category with name {category.name} already exists",
         )
+
+
+@router.delete(
+    "/{category_id}",
+    response_model=dict,
+)
+async def delete_category(
+    category_id: str,
+    category_service: CategoryService = Depends(get_category_service),
+):
+    try:
+        await category_service.delete_category(category_id=category_id)
+        return {"detail": "success"}
+    except ObjectNotFoundError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
