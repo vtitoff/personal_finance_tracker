@@ -1,4 +1,3 @@
-from functools import lru_cache
 from uuid import UUID
 
 from db.postgres import get_postgres_session

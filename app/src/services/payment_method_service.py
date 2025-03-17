@@ -33,6 +33,30 @@ class PaymentMethodService:
             except IntegrityError:
                 raise ObjectAlreadyExistsException
 
+    async def get_payment_method_by_id(self, payment_method_id: str):
+        async with self.postgres_session() as session:
+            payment_method_data = await session.scalars(
+                select(PaymentMethod).filter_by(id=payment_method_id)
+            )
+            payment_method = payment_method_data.first()
+
+            if payment_method is None:
+                raise ObjectNotFoundError("Payment method not found")
+
+            return payment_method
+
+    async def get_payment_methods_by_user_id(self, user_id: str):
+        async with self.postgres_session() as session:
+            payment_method_data = await session.scalars(
+                select(PaymentMethod).filter_by(user_id=user_id)
+            )
+            payment_methods = payment_method_data.all()
+
+            if payment_methods is None:
+                raise ObjectNotFoundError("Payment methods not found")
+
+            return payment_methods
+
 
 def get_payment_method_service(
     postgres_session: AsyncSession = Depends(get_postgres_session),
