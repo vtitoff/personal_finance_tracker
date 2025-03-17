@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_pagination import Page, paginate
 from schemas.payment_method import (CreatePaymentMethodSchema,
-                                    GetPaymentMethodSchema)
+                                    GetPaymentMethodSchema,
+                                    UpdatePaymentMethodSchema)
 from services.exceptions import (ObjectAlreadyExistsException,
                                  ObjectNotFoundError)
 from services.payment_method_service import (PaymentMethodService,
@@ -25,6 +26,26 @@ async def create_payment_method(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Payment method {payment_method.id if hasattr(payment_method, "id") else payment_method.name} already exists",
+        )
+
+
+@router.patch(
+    "/payment_methods/{payment_method_id}", response_model=GetPaymentMethodSchema
+)
+async def update_category(
+    payment_method_id: str,
+    payment_method: UpdatePaymentMethodSchema,
+    payment_method_service: PaymentMethodService = Depends(get_payment_method_service),
+) -> GetPaymentMethodSchema:
+    try:
+        updated_payment_method = await payment_method_service.update_payment_method(
+            payment_method_id, payment_method
+        )
+        return updated_payment_method
+    except ConflictError as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error,
         )
 
 
@@ -64,3 +85,18 @@ async def get_payment_method_by_user_id(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Payment methods is not found!",
         )
+
+
+@router.delete(
+    "/{payment_method_id}",
+    response_model=dict,
+)
+async def delete_payment_method(
+    payment_method_id: str,
+    payment_method_service: PaymentMethodService = Depends(get_payment_method_service),
+):
+    try:
+        await payment_method_service.delete_payment_method(payment_method_id)
+        return {"detail": "success"}
+    except ObjectNotFoundError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))

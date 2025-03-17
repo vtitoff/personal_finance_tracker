@@ -1,8 +1,6 @@
-from uuid import UUID
-
 from models.models import CurrencyEnum
 from pydantic import BaseModel
-from schemas.mixins import IdMixin
+from schemas.mixins import IdMixin, UserIdMixin
 
 
 class PaymentMethod(BaseModel):
@@ -10,12 +8,15 @@ class PaymentMethod(BaseModel):
     description: str
     amount: int
     currency: CurrencyEnum
-    user_id: UUID
 
 
-class CreatePaymentMethodSchema(PaymentMethod):
+class CreatePaymentMethodSchema(PaymentMethod, UserIdMixin):
     pass
 
 
-class GetPaymentMethodSchema(PaymentMethod, IdMixin):
+class GetPaymentMethodSchema(PaymentMethod, IdMixin, UserIdMixin):
+    pass
+
+
+class UpdatePaymentMethodSchema(PaymentMethod):
     pass

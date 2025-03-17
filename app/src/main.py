@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from api.v1.categories import router as categories_router
+from api.v1.payment_categories import router as categories_router
 from api.v1.payment_methods import router as payment_methods_router
 from core.config import settings
 from db import postgres

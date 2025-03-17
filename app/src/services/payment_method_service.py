@@ -1,7 +1,8 @@
 from db.postgres import get_postgres_session
 from fastapi.params import Depends
 from models.models import PaymentMethod
-from schemas.payment_method import CreatePaymentMethodSchema
+from schemas.payment_method import (CreatePaymentMethodSchema,
+                                    UpdatePaymentMethodSchema)
 from services.exceptions import (ObjectAlreadyExistsException,
                                  ObjectNotFoundError)
 from sqlalchemy import select
@@ -35,10 +36,10 @@ class PaymentMethodService:
 
     async def get_payment_method_by_id(self, payment_method_id: str):
         async with self.postgres_session() as session:
-            payment_method_data = await session.scalars(
+            stmt = await session.scalars(
                 select(PaymentMethod).filter_by(id=payment_method_id)
             )
-            payment_method = payment_method_data.first()
+            payment_method = stmt.first()
 
             if payment_method is None:
                 raise ObjectNotFoundError("Payment method not found")
@@ -47,15 +48,50 @@ class PaymentMethodService:
 
     async def get_payment_methods_by_user_id(self, user_id: str):
         async with self.postgres_session() as session:
-            payment_method_data = await session.scalars(
+            stmt = await session.scalars(
                 select(PaymentMethod).filter_by(user_id=user_id)
             )
-            payment_methods = payment_method_data.all()
+            payment_methods = stmt.all()
 
             if payment_methods is None:
                 raise ObjectNotFoundError("Payment methods not found")
 
             return payment_methods
+
+    async def update_payment_method(
+        self, payment_method_id: str, payment_method_data: UpdatePaymentMethodSchema
+    ):
+        async with self.postgres_session() as session:
+            stmt = await session.scalars(
+                select(PaymentMethod).filter_by(id=payment_method_id)
+            )
+
+            payment_method = stmt.first()
+
+            if payment_method is None:
+                raise ObjectNotFoundError("Payment method not found!")
+
+            for field in payment_method_data.model_fields_set:
+                field_value = getattr(payment_method_data, field)
+                setattr(payment_method, field, field_value)
+            try:
+                await session.commit()
+            except IntegrityError:
+                raise ConflictError("ConflictError")
+            return category
+
+    async def delete_payment_method(self, payment_method_id: str):
+        async with self.postgres_session() as session:
+            stmt = await session.scalars(
+                select(PaymentMethod).filter_by(id=payment_method_id)
+            )
+            payment_method = stmt.first()
+
+            if payment_method is None:
+                raise ObjectNotFoundError("Payment method not found")
+
+            await session.delete(payment_method)
+            await session.commit()
 
 
 def get_payment_method_service(

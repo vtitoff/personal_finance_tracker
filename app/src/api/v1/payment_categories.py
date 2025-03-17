@@ -3,7 +3,7 @@ from fastapi_pagination import Page, paginate
 from schemas.payment_category import (CreatePaymentCategorySchema,
                                       GetPaymentCategorySchema)
 from services.category_service import CategoryService, get_category_service
-from services.exceptions import (ObjectAlreadyExistsException,
+from services.exceptions import (ConflictError, ObjectAlreadyExistsException,
                                  ObjectNotFoundError)
 
 router = APIRouter()
@@ -41,6 +41,22 @@ async def create_categories(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Category with name {category.name} already exists",
+        )
+
+
+@router.patch("/categories", response_model=GetPaymentCategorySchema)
+async def update_category(
+    category_id: str,
+    category: CreatePaymentCategorySchema,
+    category_service: CategoryService = Depends(get_category_service),
+) -> GetPaymentCategorySchema:
+    try:
+        updated_category = await category_service.update_category(category_id, category)
+        return updated_category
+    except ConflictError as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error,
         )
 
 
