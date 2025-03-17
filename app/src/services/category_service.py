@@ -1,3 +1,4 @@
+from unicodedata import category
 from uuid import UUID
 
 from db.postgres import get_postgres_session
@@ -34,6 +35,19 @@ class CategoryService:
         async with self.postgres_session() as session:
             categories_data = await session.scalars(select(PaymentCategory))
             return categories_data.all()
+
+    async def get_category_by_id(self, category_id: str):
+        async with self.postgres_session() as session:
+            categories_data = await session.scalars(
+                select(PaymentCategory).filter_by(id=category_id)
+            )
+
+            category = categories_data.first()
+
+            if category is None:
+                raise ObjectNotFoundError("Category not found")
+
+            return category
 
     async def delete_category(self, category_id: UUID):
         async with self.postgres_session() as session:

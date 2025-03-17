@@ -17,6 +17,18 @@ async def get_categories(
     return paginate(categories)
 
 
+@router.get("/categories/{category_id}", response_model=GetPaymentCategorySchema)
+async def get_categories(
+    category_id: str,
+    category_service: CategoryService = Depends(get_category_service),
+) -> GetPaymentCategorySchema:
+    try:
+        category = await category_service.get_category_by_id(category_id)
+        return category
+    except ObjectNotFoundError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
+
+
 @router.post("/categories", response_model=GetPaymentCategorySchema)
 async def create_categories(
     category: CreatePaymentCategorySchema,
