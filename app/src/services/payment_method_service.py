@@ -1,6 +1,6 @@
 from db.postgres import get_postgres_session
 from fastapi.params import Depends
-from models.models import PaymentMethod
+from models import PaymentMethod
 from schemas.payment_method import (CreatePaymentMethodSchema,
                                     UpdatePaymentMethodSchema)
 from services.exceptions import (ObjectAlreadyExistsException,

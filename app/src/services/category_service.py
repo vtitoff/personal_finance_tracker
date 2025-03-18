@@ -1,6 +1,6 @@
 from db.postgres import get_postgres_session
 from fastapi import Depends
-from models.models import PaymentCategory
+from models import PaymentCategory
 from schemas.payment_category import CreatePaymentCategorySchema
 from services.exceptions import (ConflictError, ObjectAlreadyExistsException,
                                  ObjectNotFoundError)

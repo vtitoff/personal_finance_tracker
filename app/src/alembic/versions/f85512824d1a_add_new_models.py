@@ -8,9 +8,9 @@ Create Date: 2025-03-07 18:15:46.589180
 
 from typing import Sequence, Union
 
-import models
 import sqlalchemy as sa
 from alembic import op
+from models.sqlalchemy_utils.email import EmailType
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
@@ -72,9 +72,7 @@ def upgrade() -> None:
         sa.Column("password", sa.String(), nullable=False),
         sa.Column("first_name", sa.String(), nullable=True),
         sa.Column("last_name", sa.String(), nullable=True),
-        sa.Column(
-            "email", models.sqlalchemy_utils.email.EmailType(length=255), nullable=False
-        ),
+        sa.Column("email", EmailType(length=255), nullable=False),
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column(
             "created_at",

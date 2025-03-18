@@ -1,4 +1,4 @@
-from models.models import CurrencyEnum
+from models import CurrencyEnum
 from pydantic import BaseModel
 from schemas.mixins import IdMixin, UserIdMixin
 
