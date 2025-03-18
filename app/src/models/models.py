@@ -1,11 +1,12 @@
 import enum
 import uuid
 from datetime import datetime, timezone
-from typing import List
 
 from models.sqlalchemy_utils.email import EmailType
-from sqlalchemy import BigInteger, ForeignKey, String, Text, func
+from sqlalchemy import (BigInteger, Column, DateTime, ForeignKey, String,
+                        Table, Text, func)
 from sqlalchemy.dialects.postgresql import ENUM, TIMESTAMP
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import (DeclarativeBase, Mapped, mapped_column,
@@ -36,6 +37,15 @@ class Base(DeclarativeBase):
         server_default=func.current_timestamp(),
         server_onupdate=func.current_timestamp(),
     )
+
+
+user_role = Table(
+    "user_role",
+    Base.metadata,
+    Column("user_id", UUID(), ForeignKey("user.id"), primary_key=True),
+    Column("role_id", UUID(), ForeignKey("role.id"), primary_key=True),
+    Column("created_at", DateTime, server_default=func.now()),
+)
 
 
 class Payment(Base):
@@ -103,6 +113,9 @@ class User(Base):
     first_name: Mapped[str] = mapped_column(String, nullable=True)
     last_name: Mapped[str] = mapped_column(String, nullable=True)
     email: Mapped[str] = mapped_column(EmailType)
+    roles = relationship(
+        "Role", secondary=user_role, backref="user", cascade="all, delete"
+    )
 
     def __init__(
         self, login: str, password: str, first_name: str, last_name: str
@@ -117,3 +130,7 @@ class User(Base):
 
     def __repr__(self) -> str:
         return f"<User {self.login}>"
+
+
+class Role(Base):
+    title: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
