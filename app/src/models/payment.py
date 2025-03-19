@@ -28,6 +28,7 @@ class Payment(Base):
     payment_method_id: Mapped[uuid.UUID] = mapped_column(
         PgUUID, ForeignKey("paymentmethod.id", ondelete="SET NULL")
     )
+    user_id: Mapped[uuid.UUID] = mapped_column(PgUUID, ForeignKey("user.id"))
 
     @validates("date")
     def validate_date(self, key, value):
