@@ -15,7 +15,8 @@ class CreatePaymentMethodSchema(PaymentMethod, UserIdMixin):
 
 
 class GetPaymentMethodSchema(PaymentMethod, IdMixin, UserIdMixin):
-    pass
+    class Config:
+        from_attributes = True
 
 
 class UpdatePaymentMethodSchema(PaymentMethod):

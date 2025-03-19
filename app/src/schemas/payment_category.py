@@ -12,4 +12,5 @@ class CreatePaymentCategorySchema(PaymentCategory):
 
 
 class GetPaymentCategorySchema(PaymentCategory, IdMixin):
-    pass
+    class Config:
+        from_attributes = True

@@ -10,3 +10,5 @@ venv
 .mypy_cache/
 .env
 .pytest_cache/
+redis_data/
+redis.conf
