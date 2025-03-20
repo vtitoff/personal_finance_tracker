@@ -10,7 +10,7 @@ class User(Base):
     password: Mapped[str] = mapped_column(String, nullable=False)
     first_name: Mapped[str] = mapped_column(String, nullable=True)
     last_name: Mapped[str] = mapped_column(String, nullable=True)
-    email: Mapped[str] = mapped_column(EmailType)
+    email: Mapped[str] = mapped_column(EmailType, nullable=True)
     roles = relationship(
         "Role", secondary=user_role, backref="user", cascade="all, delete"
     )
