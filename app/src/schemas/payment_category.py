@@ -4,7 +4,7 @@ from schemas.mixins import IdMixin
 
 class PaymentCategory(BaseModel):
     name: str
-    description: str
+    description: str | None = None
 
 
 class CreatePaymentCategorySchema(PaymentCategory):

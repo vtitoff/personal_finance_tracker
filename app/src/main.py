@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from api.v1.payment_categories import router as categories_router
 from api.v1.payment_methods import router as payment_methods_router
+from api.v1.users import router as users_router
 from core.config import settings
 from db import postgres
 from fastapi import FastAPI
@@ -31,6 +32,7 @@ app = FastAPI(
 
 app.include_router(categories_router, prefix="/api/v1", tags=["categories"])
 app.include_router(payment_methods_router, prefix="/api/v1", tags=["payment_methods"])
+app.include_router(users_router, prefix="/api/v1", tags=["users"])
 
 add_pagination(app)
 

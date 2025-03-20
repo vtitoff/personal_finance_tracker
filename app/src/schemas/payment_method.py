@@ -5,7 +5,7 @@ from schemas.mixins import IdMixin, UserIdMixin
 
 class PaymentMethod(BaseModel):
     name: str
-    description: str
+    description: str | None = None
     amount: int
     currency: CurrencyEnum
 
