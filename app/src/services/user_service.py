@@ -40,8 +40,16 @@ class UserService:
 
             return user
 
-    async def get_user_by_login(self):
-        pass
+    async def get_user_by_login(self, user_login: str):
+        async with self.postgres_session() as session:
+            stmt = await session.scalars(select(User).filter_by(login=user_login))
+
+            user = stmt.first()
+
+            if user is None:
+                raise ObjectNotFoundError("User not found")
+
+            return user
 
     async def update_user(self):
         pass

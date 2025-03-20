@@ -20,6 +20,18 @@ async def get_user_by_id(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
 
 
+@router.get("/logins/{user_login}", response_model=GetUserSchema)
+async def get_user_by_login(
+    user_login: str,
+    user_service: UserService = Depends(get_user_service),
+) -> GetUserSchema:
+    try:
+        user = await user_service.get_user_by_login(user_login)
+        return user
+    except ObjectNotFoundError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
+
+
 @router.post("/users/create", response_model=GetUserSchema)
 async def create_user(
     user: CreateUserSchema,
