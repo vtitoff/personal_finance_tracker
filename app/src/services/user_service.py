@@ -51,11 +51,34 @@ class UserService:
 
             return user
 
-    async def update_user(self):
-        pass
+    async def update_user(self, user_id: str, user_data: CreateUserSchema) -> User:
+        async with self.postgres_session() as session:
+            stmt = await session.scalars(select(User).filter_by(id=user_id))
 
-    async def get_user_roles(self):
-        pass
+            user = stmt.first()
+
+            if user is None:
+                raise ObjectNotFoundError("User not found!")
+
+            for field in user_data.model_fields_set:
+                field_value = getattr(user_data, field)
+                setattr(user, field, field_value)
+            try:
+                await session.commit()
+            except IntegrityError:
+                raise ConflictError("ConflictError")
+            return user
+
+    async def delete_user(self, user_id: str):
+        async with self.postgres_session() as session:
+            stmt = await session.scalars(select(User).filter_by(id=user_id))
+            user = stmt.first()
+
+            if user is None:
+                raise ObjectNotFoundError("User not found")
+
+            await session.delete(user)
+            await session.commit()
 
 
 def get_user_service(

@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi_pagination import Page, paginate
 from schemas.user import CreateUserSchema, GetUserSchema
 from services.exceptions import (ConflictError, ObjectAlreadyExistsException,
                                  ObjectNotFoundError)
@@ -47,17 +46,32 @@ async def create_user(
         )
 
 
-# @router.patch("/users/{user_id}", response_model=GetUserSchema)
-# async def update_category(
-#     user_id: str,
-#     user: CreateUserSchema,
-#     user_service: UserService = Depends(get_user_service),
-# ) -> GetUserSchema:
-#     try:
-#         updated_user = await user_service.update_user(user_id, user)
-#         return updated_user
-#     except ConflictError as error:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail=error,
-#         )
+@router.patch("/users/{user_id}", response_model=GetUserSchema)
+async def update_user(
+    user_id: str,
+    user: CreateUserSchema,
+    user_service: UserService = Depends(get_user_service),
+) -> GetUserSchema:
+    try:
+        updated_user = await user_service.update_user(user_id, user)
+        return updated_user
+    except ConflictError as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error,
+        )
+
+
+@router.delete(
+    "/users/{user_id}",
+    response_model=dict,
+)
+async def delete_user(
+    user_id: str,
+    user_service: UserService = Depends(get_user_service),
+):
+    try:
+        await user_service.delete_user(user_id=user_id)
+        return {"detail": "success"}
+    except ObjectNotFoundError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
