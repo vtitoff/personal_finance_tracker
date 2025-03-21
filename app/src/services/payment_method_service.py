@@ -4,7 +4,7 @@ from models import PaymentMethod
 from schemas.payment_method import (CreatePaymentMethodSchema,
                                     UpdatePaymentMethodSchema)
 from services.exceptions import (ObjectAlreadyExistsException,
-                                 ObjectNotFoundError)
+                                 ObjectNotFoundError, ConflictError)
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -77,8 +77,8 @@ class PaymentMethodService:
             try:
                 await session.commit()
             except IntegrityError:
-                raise ConflictError("ConflictError")
-            return category
+                raise ConflictError("Conflict Error")
+            return payment_method
 
     async def delete_payment_method(self, payment_method_id: str):
         async with self.postgres_session() as session:
