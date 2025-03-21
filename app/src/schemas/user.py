@@ -15,4 +15,5 @@ class CreateUserSchema(UserSchema):
 
 
 class GetUserSchema(IdMixin, UserSchema):
-    pass
+    class Config:
+        from_attributes: True

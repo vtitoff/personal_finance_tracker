@@ -3,8 +3,8 @@ from fastapi.params import Depends
 from models import PaymentMethod
 from schemas.payment_method import (CreatePaymentMethodSchema,
                                     UpdatePaymentMethodSchema)
-from services.exceptions import (ObjectAlreadyExistsException,
-                                 ObjectNotFoundError, ConflictError)
+from services.exceptions import (ConflictError, ObjectAlreadyExistsException,
+                                 ObjectNotFoundError)
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession

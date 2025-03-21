@@ -1,8 +1,8 @@
 from db.postgres import get_postgres_session
 from fastapi.params import Depends
-from models import User
+from models import Role, User
 from schemas.user import CreateUserSchema
-from services.exceptions import (ObjectAlreadyExistsException,
+from services.exceptions import (ConflictError, ObjectAlreadyExistsException,
                                  ObjectNotFoundError)
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -40,7 +40,7 @@ class UserService:
 
             return user
 
-    async def get_user_by_login(self, user_login: str):
+    async def get_user_by_login(self, user_login: str) -> User:
         async with self.postgres_session() as session:
             stmt = await session.scalars(select(User).filter_by(login=user_login))
 
@@ -79,6 +79,16 @@ class UserService:
 
             await session.delete(user)
             await session.commit()
+
+    async def get_user_roles(self, user_id: str):
+        async with self.postgres_session() as session:
+            stmt = await session.scalars(select(User).filter_by(id=user_id))
+            user = stmt.first()
+
+            if user is None:
+                raise ObjectNotFoundError("User not found")
+
+            return user.roles
 
 
 def get_user_service(

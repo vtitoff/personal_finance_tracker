@@ -12,7 +12,11 @@ class User(Base):
     last_name: Mapped[str] = mapped_column(String, nullable=True)
     email: Mapped[str] = mapped_column(EmailType, nullable=True)
     roles = relationship(
-        "Role", secondary=user_role, backref="user", cascade="all, delete"
+        "Role",
+        secondary=user_role,
+        backref="user",
+        cascade="all, delete",
+        lazy="selectin",
     )
 
     def __init__(
