@@ -13,7 +13,6 @@ class RefreshToken(Base):
     )
     token: Mapped[str] = mapped_column(String(255), nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    user = relationship("User", back_populates="refresh_token")
 
     def __repr__(self) -> str:
         return f"<RefreshToken {self.token} for User {self.user_id}>"

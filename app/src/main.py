@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
+from api.v1.auth import router as auth_router
 from api.v1.payment_categories import router as categories_router
 from api.v1.payment_methods import router as payment_methods_router
 from api.v1.users import router as users_router
@@ -33,6 +34,7 @@ app = FastAPI(
 app.include_router(categories_router, prefix="/api/v1", tags=["categories"])
 app.include_router(payment_methods_router, prefix="/api/v1", tags=["payment_methods"])
 app.include_router(users_router, prefix="/api/v1", tags=["users"])
+app.include_router(auth_router, prefix="/api/v1", tags=["auth"])
 
 add_pagination(app)
 
