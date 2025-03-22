@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     engine_echo: bool = Field(False, alias="ENGINE_ECHO")
     jwt_secret_key: str = Field("my_secret_key", alias="JWT_SECRET_KEY")
     jwt_algorithm: str = Field("HS256", alias="JWT_ALGORITHM")
+    redis_port: str = Field("6379", alias="REDIS_PORT")
+    redis_host: str = Field("redis", alias="REDIS_HOST")
 
 
 settings = Settings()

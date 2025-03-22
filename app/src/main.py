@@ -6,21 +6,26 @@ from api.v1.payment_categories import router as categories_router
 from api.v1.payment_methods import router as payment_methods_router
 from api.v1.users import router as users_router
 from core.config import settings
-from db import postgres
+from db import postgres, redis
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_pagination import add_pagination
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
                                     create_async_engine)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    postgres.engine = create_async_engine(
-        postgres.dsn, echo=settings.engine_echo, future=True
-    )
-    postgres.async_session = async_sessionmaker(bind=postgres.engine, expire_on_commit=False, class_=AsyncSession)  # type: ignore[assignment]
-    yield
+    try:
+        redis.redis = Redis(host=settings.redis_host, port=settings.redis_port)
+        postgres.engine = create_async_engine(
+            postgres.dsn, echo=settings.engine_echo, future=True
+        )
+        postgres.async_session = async_sessionmaker(bind=postgres.engine, expire_on_commit=False, class_=AsyncSession)  # type: ignore[assignment]
+        yield
+    finally:
+        await redis.redis.close()
 
 
 app = FastAPI(
