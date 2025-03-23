@@ -9,6 +9,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
     access_token_exp_hours: int = Field(5, alias="ACCESS_TOKEN_EXPIRATION_HOURS")
+    refresh_token_exp_days: int = Field(5, alias="REFRESH_TOKEN_EXPIRATION_DAYS")
     project_name: str = Field("Personal Finance Tracker", alias="PROJECT_NAME")
     postgres_url: str = Field(
         "postgresql+asyncpg://postgres:postgres@db:5432/foo", alias="POSTGRES_URL"

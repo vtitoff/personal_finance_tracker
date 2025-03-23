@@ -49,7 +49,7 @@ class AuthService:
             session.add(refresh_token)
             await session.commit()
 
-            return refresh_token
+            return refresh_token.token
 
     async def is_refresh_token_valid(self, refresh_token: str) -> bool:
         async with self.postgres_session() as session:
