@@ -8,7 +8,7 @@ from services.user_service import UserService, get_user_service
 router = APIRouter()
 
 
-@router.get("/users/{user_id}", response_model=GetUserSchema)
+@router.get("/{user_id}", response_model=GetUserSchema)
 async def get_user_by_id(
     user_id: str,
     user_service: UserService = Depends(get_user_service),
@@ -32,7 +32,7 @@ async def get_user_by_login(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
 
 
-@router.patch("/users/{user_id}", response_model=GetUserSchema)
+@router.patch("/{user_id}", response_model=GetUserSchema)
 async def update_user(
     user_id: str,
     user: CreateUserSchema,
@@ -49,7 +49,7 @@ async def update_user(
 
 
 @router.delete(
-    "/users/{user_id}",
+    "/{user_id}",
     response_model=dict,
 )
 async def delete_user(

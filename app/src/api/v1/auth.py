@@ -12,7 +12,7 @@ from utils.auth import decode_token
 router = APIRouter()
 
 
-@router.post("/auth/signup", response_model=AuthOutputSchema)
+@router.post("/signup", response_model=AuthOutputSchema)
 async def signup(
     user: CreateUserSchema,
     user_service: UserService = Depends(get_user_service),
@@ -37,7 +37,7 @@ async def signup(
 
 
 @router.post(
-    "/auth/refresh",
+    "/refresh",
     response_model=AuthOutputSchema,
 )
 async def refresh(
@@ -71,7 +71,7 @@ async def refresh(
 
 
 @router.post(
-    "/auth/login",
+    "/login",
     response_model=AuthOutputSchema,
 )
 async def login(
@@ -81,25 +81,27 @@ async def login(
 ) -> AuthOutputSchema:
     try:
         user = await user_service.get_user_by_login(login_data.login)
+
+        if not user.check_password(login_data.password):
+            raise HTTPException(HTTPStatus.BAD_REQUEST, detail="invalid password")
+
+        user_id = str(user.id)
+
+        # await user_service.save_login_history(user_id) TODO
+
+        user_roles = [x.title for x in await user_service.get_user_roles(user_id)]
+
+        access_token = await auth_service.generate_access_token(user_id, user_roles)
+        refresh_token = await auth_service.generate_refresh_token(user_id)
+
+        return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token)
     except ObjectNotFoundError:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="user not found")
-
-    if not user.check_password(login_data.password):
-        raise HTTPException(HTTPStatus.BAD_REQUEST, detail="invalid password")
-
-    user_id = str(user.id)
-
-    # await user_service.save_login_history(user_id) TODO
-
-    user_roles = [x.title for x in await user_service.get_user_roles(user_id)]
-
-    access_token = await auth_service.generate_access_token(user_id, user_roles)
-    refresh_token = await auth_service.generate_refresh_token(user_id)
-
-    return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token)
+    except Exception as e:
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=e)
 
 
-@router.post("/auth/logout", response_model=dict)
+@router.post("/logout", response_model=dict)
 async def logout(
     request_data: RefreshInputSchema,
     auth_service: AuthService = Depends(get_auth_service),
@@ -116,7 +118,7 @@ async def logout(
     return {"detail": "logout success"}
 
 
-@router.post("/auth/logout/all", response_model=dict)
+@router.post("/logout/all", response_model=dict)
 async def logout_all(
     request_data: RefreshInputSchema,
     auth_service: AuthService = Depends(get_auth_service),

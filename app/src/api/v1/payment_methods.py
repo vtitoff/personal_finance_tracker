@@ -3,7 +3,7 @@ from fastapi_pagination import Page, paginate
 from schemas.payment_method import (CreatePaymentMethodSchema,
                                     GetPaymentMethodSchema,
                                     UpdatePaymentMethodSchema)
-from services.exceptions import (ObjectAlreadyExistsException,
+from services.exceptions import (ConflictError, ObjectAlreadyExistsException,
                                  ObjectNotFoundError)
 from services.payment_method_service import (PaymentMethodService,
                                              get_payment_method_service)
@@ -12,7 +12,7 @@ from sqlalchemy.exc import DBAPIError
 router = APIRouter()
 
 
-@router.post("/payment_methods", response_model=GetPaymentMethodSchema)
+@router.post("/", response_model=GetPaymentMethodSchema)
 async def create_payment_method(
     payment_method: CreatePaymentMethodSchema,
     payment_method_service: PaymentMethodService = Depends(get_payment_method_service),
@@ -29,9 +29,7 @@ async def create_payment_method(
         )
 
 
-@router.patch(
-    "/payment_methods/{payment_method_id}", response_model=GetPaymentMethodSchema
-)
+@router.patch("/{payment_method_id}", response_model=GetPaymentMethodSchema)
 async def update_category(
     payment_method_id: str,
     payment_method: UpdatePaymentMethodSchema,
@@ -49,9 +47,7 @@ async def update_category(
         )
 
 
-@router.get(
-    "/payment_methods/{payment_method_id}", response_model=GetPaymentMethodSchema
-)
+@router.get("/{payment_method_id}", response_model=GetPaymentMethodSchema)
 async def get_payment_method_by_id(
     payment_method_id: str,
     payment_method_service: PaymentMethodService = Depends(get_payment_method_service),
@@ -68,9 +64,7 @@ async def get_payment_method_by_id(
         )
 
 
-@router.get(
-    "/payment_methods/users/{user_id}", response_model=Page[GetPaymentMethodSchema]
-)
+@router.get("/users/{user_id}", response_model=Page[GetPaymentMethodSchema])
 async def get_payment_method_by_user_id(
     user_id: str,
     payment_method_service: PaymentMethodService = Depends(get_payment_method_service),

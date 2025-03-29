@@ -36,10 +36,12 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 
-app.include_router(categories_router, prefix="/api/v1", tags=["categories"])
-app.include_router(payment_methods_router, prefix="/api/v1", tags=["payment_methods"])
-app.include_router(users_router, prefix="/api/v1", tags=["users"])
-app.include_router(auth_router, prefix="/api/v1", tags=["auth"])
+app.include_router(categories_router, prefix="/api/v1/categories", tags=["categories"])
+app.include_router(
+    payment_methods_router, prefix="/api/v1/payment_methods", tags=["payment_methods"]
+)
+app.include_router(users_router, prefix="/api/v1/users", tags=["users"])
+app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
 
 add_pagination(app)
 
