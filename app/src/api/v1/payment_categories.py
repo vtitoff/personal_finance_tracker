@@ -66,8 +66,7 @@ async def update_category(
             )
 
         user_id = payload["user_id"]
-        # check_admin_access(payload, user_id)
-        check_user_access(payload, user_id)
+        check_admin_access(payload, user_id)
 
         updated_category = await category_service.update_category(category_id, category)
         return updated_category

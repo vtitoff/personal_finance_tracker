@@ -1,6 +1,8 @@
 from http import HTTPStatus
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from schemas.auth import AuthOutputSchema, LoginInputSchema, RefreshInputSchema
 from schemas.user import CreateUserSchema
 from services.auth_service import AuthService, get_auth_service
@@ -131,3 +133,34 @@ async def logout_all(
         refresh_token_data["user_id"], request_data.refresh_token
     )
     return {"detail": "logout from all other devices success"}
+
+
+@router.post(
+    "/token",
+    response_model=AuthOutputSchema,
+)
+async def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    auth_service: AuthService = Depends(get_auth_service),
+    user_service: UserService = Depends(get_user_service),
+) -> AuthOutputSchema:
+    try:
+        user = await user_service.get_user_by_login(form_data.username)
+
+        if not user.check_password(form_data.password):
+            raise HTTPException(HTTPStatus.BAD_REQUEST, detail="invalid password")
+
+        user_id = str(user.id)
+
+        # await user_service.save_login_history(user_id) TODO
+
+        user_roles = [x.title for x in await user_service.get_user_roles(user_id)]
+
+        access_token = await auth_service.generate_access_token(user_id, user_roles)
+        refresh_token = await auth_service.generate_refresh_token(user_id)
+
+        return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token)
+    except ObjectNotFoundError:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="user not found")
+    except Exception as e:
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=e)
