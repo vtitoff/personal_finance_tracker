@@ -65,8 +65,7 @@ async def update_category(
                 status_code=HTTPStatus.UNAUTHORIZED, detail="invalid token"
             )
 
-        user_id = payload["user_id"]
-        check_admin_access(payload, user_id)
+        check_admin_access(payload)
 
         updated_category = await category_service.update_category(category_id, category)
         return updated_category
@@ -83,9 +82,19 @@ async def update_category(
 )
 async def delete_category(
     category_id: str,
+    access_token: Annotated[str, Depends(oauth2_scheme)],
     category_service: CategoryService = Depends(get_category_service),
 ):
     try:
+        payload = decode_token(access_token)
+
+        if not payload:
+            raise HTTPException(
+                status_code=HTTPStatus.UNAUTHORIZED, detail="invalid token"
+            )
+
+        check_admin_access(payload)
+
         await category_service.delete_category(category_id=category_id)
         return {"detail": "success"}
     except ObjectNotFoundError as error:

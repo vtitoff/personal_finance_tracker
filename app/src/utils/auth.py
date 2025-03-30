@@ -20,11 +20,22 @@ def decode_token(token: str) -> dict[str, Any] | None:
     return payload
 
 
+def get_user_id_from_token(access_token: str) -> str:
+    payload = decode_token(access_token)
+
+    if not payload:
+        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="invalid token")
+
+    user_id = payload["user_id"]
+
+    return user_id
+
+
 def check_user_access(auth_data: dict[str, Any], user_id: str):
-    if "admin" not in auth_data["roles"] and str(user_id) != auth_data["user_id"]:
+    if "admin" not in auth_data["roles"] and user_id != auth_data["user_id"]:
         raise HTTPException(status_code=HTTPStatus.FORBIDDEN)
 
 
-def check_admin_access(auth_data: dict[str, Any], user_id: str):
+def check_admin_access(auth_data: dict[str, Any]):
     if "admin" not in auth_data["roles"]:
         raise HTTPException(status_code=HTTPStatus.FORBIDDEN)
