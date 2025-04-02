@@ -3,7 +3,9 @@ from contextlib import asynccontextmanager
 import uvicorn
 from api.v1.auth import router as auth_router
 from api.v1.incoming_categories import router as incoming_categories_router
+from api.v1.incoming_transactions import router as incoming_transactions_router
 from api.v1.outgoing_categories import router as outgoing_categories_router
+from api.v1.outgoing_transactions import router as outgoing_transactions_router
 from api.v1.users import router as users_router
 from api.v1.wallets import router as wallets_router
 from core.config import settings
@@ -39,13 +41,23 @@ app = FastAPI(
 
 app.include_router(
     outgoing_categories_router,
-    prefix="/api/v1/outgoing_categories",
+    prefix="/api/v1/categories/outgoing",
     tags=["outgoing_categories"],
 )
 app.include_router(
     incoming_categories_router,
-    prefix="/api/v1/incoming_categories",
+    prefix="/api/v1/categories/incoming",
     tags=["incoming_categories"],
+)
+app.include_router(
+    incoming_transactions_router,
+    prefix="/api/v1/transactions/incoming",
+    tags=["incoming_transactions"],
+)
+app.include_router(
+    outgoing_transactions_router,
+    prefix="/api/v1/transactions/outgoing",
+    tags=["outgoing_transactions"],
 )
 app.include_router(wallets_router, prefix="/api/v1/wallets", tags=["wallets"])
 app.include_router(users_router, prefix="/api/v1/users", tags=["users"])
