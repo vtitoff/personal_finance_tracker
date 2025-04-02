@@ -3,21 +3,21 @@ from pydantic import BaseModel
 from schemas.mixins import IdMixin, UserIdMixin
 
 
-class PaymentMethod(BaseModel):
+class Wallet(BaseModel):
     name: str
     description: str | None = None
     amount: int
     currency: CurrencyEnum
 
 
-class CreatePaymentMethodSchema(PaymentMethod, UserIdMixin):
+class CreateWalletSchema(UserIdMixin, Wallet):
     pass
 
 
-class GetPaymentMethodSchema(PaymentMethod, IdMixin, UserIdMixin):
+class GetWalletSchema(IdMixin, UserIdMixin, Wallet):
     class Config:
         from_attributes = True
 
 
-class UpdatePaymentMethodSchema(PaymentMethod):
+class UpdateWalletSchema(Wallet):
     pass

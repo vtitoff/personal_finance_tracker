@@ -1,32 +1,24 @@
 import uuid
 from datetime import datetime, timezone
 
-from models import Base, CurrencyEnum
+from models import Base
 from sqlalchemy import BigInteger, ForeignKey, Text, func
-from sqlalchemy.dialects.postgresql import ENUM, TIMESTAMP
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.orm import Mapped, mapped_column, validates
 
 
-class Payment(Base):
+class OutgoingTransaction(Base):
     amount: Mapped[int] = mapped_column(BigInteger)
-    currency: Mapped[CurrencyEnum] = mapped_column(
-        ENUM(
-            CurrencyEnum,
-            values_callable=lambda obj: [e.value for e in obj],
-            name="currency",
-        ),
-        default=CurrencyEnum.RUB.value,
-    )
     description: Mapped[str] = mapped_column(Text, nullable=True)
     date: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), server_default=func.current_timestamp()
     )
     category_id: Mapped[uuid.UUID] = mapped_column(
-        PgUUID, ForeignKey("paymentcategory.id", ondelete="SET NULL")
+        PgUUID, ForeignKey("outgoingcategory.id", ondelete="SET NULL")
     )
-    payment_method_id: Mapped[uuid.UUID] = mapped_column(
-        PgUUID, ForeignKey("paymentmethod.id", ondelete="SET NULL")
+    wallet_id: Mapped[uuid.UUID] = mapped_column(
+        PgUUID, ForeignKey("wallet.id", ondelete="SET NULL")
     )
     user_id: Mapped[uuid.UUID] = mapped_column(PgUUID, ForeignKey("user.id"))
 

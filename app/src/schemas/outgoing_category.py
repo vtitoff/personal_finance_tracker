@@ -2,15 +2,15 @@ from pydantic import BaseModel
 from schemas.mixins import IdMixin
 
 
-class IncomeCategory(BaseModel):
+class OutgoingCategory(BaseModel):
     name: str
     description: str | None = None
 
 
-class CreateIncomeCategorySchema(IncomeCategory):
+class CreateOutgoingCategorySchema(OutgoingCategory):
     pass
 
 
-class GetIncomeCategorySchema(IncomeCategory, IdMixin):
+class GetOutgoingCategorySchema(OutgoingCategory, IdMixin):
     class Config:
         from_attributes = True

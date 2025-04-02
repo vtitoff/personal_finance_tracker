@@ -2,15 +2,15 @@ from pydantic import BaseModel
 from schemas.mixins import IdMixin
 
 
-class PaymentCategory(BaseModel):
+class IncomingCategory(BaseModel):
     name: str
     description: str | None = None
 
 
-class CreatePaymentCategorySchema(PaymentCategory):
+class CreateIncomingCategorySchema(IncomingCategory):
     pass
 
 
-class GetPaymentCategorySchema(PaymentCategory, IdMixin):
+class GetIncomingCategorySchema(IdMixin, IncomingCategory):
     class Config:
         from_attributes = True

@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 
 from db.postgres import get_postgres_session
 from fastapi import Depends
-from models import IncomeCategory, PaymentCategory
-from schemas.income_category import CreateIncomeCategorySchema
-from schemas.payment_category import CreatePaymentCategorySchema
+from models import IncomingCategory, OutgoingCategory
+from schemas.incoming_category import CreateIncomingCategorySchema
+from schemas.outgoing_category import CreateOutgoingCategorySchema
 from services.exceptions import (ConflictError, ObjectAlreadyExistsException,
                                  ObjectNotFoundError)
 from sqlalchemy import select
@@ -34,12 +34,12 @@ class AbstractCategoryService(ABC):
         pass
 
 
-class PaymentCategoryService(AbstractCategoryService):
+class OutgoingCategoryService(AbstractCategoryService):
     def __init__(self, postgres_session: AsyncSession):
         self.postgres_session = postgres_session
 
-    async def create_category(self, data: CreatePaymentCategorySchema):
-        payment_category = PaymentCategory(
+    async def create_category(self, data: CreateOutgoingCategorySchema):
+        payment_category = OutgoingCategory(
             name=data.name,
             description=data.description,
         )
@@ -55,13 +55,13 @@ class PaymentCategoryService(AbstractCategoryService):
 
     async def get_all_categories(self):
         async with self.postgres_session() as session:
-            stmt = await session.scalars(select(PaymentCategory))
+            stmt = await session.scalars(select(OutgoingCategory))
             return stmt.all()
 
     async def get_category_by_id(self, category_id: str):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
-                select(PaymentCategory).filter_by(id=category_id)
+                select(OutgoingCategory).filter_by(id=category_id)
             )
 
             category = stmt.first()
@@ -72,11 +72,11 @@ class PaymentCategoryService(AbstractCategoryService):
             return category
 
     async def update_category(
-        self, category_id: str, data: CreatePaymentCategorySchema
+        self, category_id: str, data: CreateOutgoingCategorySchema
     ):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
-                select(PaymentCategory).filter_by(id=category_id)
+                select(OutgoingCategory).filter_by(id=category_id)
             )
 
             category = stmt.first()
@@ -96,7 +96,7 @@ class PaymentCategoryService(AbstractCategoryService):
     async def delete_category(self, category_id: str):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
-                select(PaymentCategory).filter_by(id=category_id)
+                select(OutgoingCategory).filter_by(id=category_id)
             )
             category = stmt.first()
 
@@ -107,12 +107,12 @@ class PaymentCategoryService(AbstractCategoryService):
             await session.commit()
 
 
-class IncomeCategoryService(AbstractCategoryService):
+class IncomingCategoryService(AbstractCategoryService):
     def __init__(self, postgres_session: AsyncSession):
         self.postgres_session = postgres_session
 
-    async def create_category(self, data: CreateIncomeCategorySchema):
-        category = IncomeCategory(
+    async def create_category(self, data: CreateIncomingCategorySchema):
+        category = IncomingCategory(
             name=data.name,
             description=data.description,
         )
@@ -128,13 +128,13 @@ class IncomeCategoryService(AbstractCategoryService):
 
     async def get_all_categories(self):
         async with self.postgres_session() as session:
-            stmt = await session.scalars(select(IncomeCategory))
+            stmt = await session.scalars(select(IncomingCategory))
             return stmt.all()
 
     async def get_category_by_id(self, category_id: str):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
-                select(IncomeCategory).filter_by(id=category_id)
+                select(IncomingCategory).filter_by(id=category_id)
             )
 
             category = stmt.first()
@@ -144,10 +144,12 @@ class IncomeCategoryService(AbstractCategoryService):
 
             return category
 
-    async def update_category(self, category_id: str, data: CreateIncomeCategorySchema):
+    async def update_category(
+        self, category_id: str, data: CreateIncomingCategorySchema
+    ):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
-                select(IncomeCategory).filter_by(id=category_id)
+                select(IncomingCategory).filter_by(id=category_id)
             )
 
             category = stmt.first()
@@ -167,7 +169,7 @@ class IncomeCategoryService(AbstractCategoryService):
     async def delete_category(self, category_id: str):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
-                select(IncomeCategory).filter_by(id=category_id)
+                select(IncomingCategory).filter_by(id=category_id)
             )
             category = stmt.first()
 
@@ -178,13 +180,13 @@ class IncomeCategoryService(AbstractCategoryService):
             await session.commit()
 
 
-def get_payment_category_service(
+def get_outgoing_category_service(
     postgres_session: AsyncSession = Depends(get_postgres_session),
-) -> PaymentCategoryService:
-    return PaymentCategoryService(postgres_session)
+) -> OutgoingCategoryService:
+    return OutgoingCategoryService(postgres_session)
 
 
-def get_income_category_service(
+def get_incoming_category_service(
     postgres_session: AsyncSession = Depends(get_postgres_session),
-) -> IncomeCategoryService:
-    return IncomeCategoryService(postgres_session)
+) -> IncomingCategoryService:
+    return IncomingCategoryService(postgres_session)

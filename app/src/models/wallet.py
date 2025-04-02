@@ -7,7 +7,7 @@ from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 
-class PaymentMethod(Base):
+class Wallet(Base):
     name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     amount: Mapped[int] = mapped_column(BigInteger)

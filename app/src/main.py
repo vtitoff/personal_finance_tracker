@@ -2,10 +2,10 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from api.v1.auth import router as auth_router
-from api.v1.income_categories import router as income_categories_router
-from api.v1.payment_categories import router as payment_categories_router
-from api.v1.payment_methods import router as payment_methods_router
+from api.v1.incoming_categories import router as incoming_categories_router
+from api.v1.outgoing_categories import router as outgoing_categories_router
 from api.v1.users import router as users_router
+from api.v1.wallets import router as wallets_router
 from core.config import settings
 from db import postgres, redis
 from fastapi import FastAPI
@@ -38,18 +38,16 @@ app = FastAPI(
 )
 
 app.include_router(
-    payment_categories_router,
-    prefix="/api/v1/payment_categories",
-    tags=["payment_categories"],
+    outgoing_categories_router,
+    prefix="/api/v1/outgoing_categories",
+    tags=["outgoing_categories"],
 )
 app.include_router(
-    income_categories_router,
-    prefix="/api/v1/income_categories",
-    tags=["income_categories"],
+    incoming_categories_router,
+    prefix="/api/v1/incoming_categories",
+    tags=["incoming_categories"],
 )
-app.include_router(
-    payment_methods_router, prefix="/api/v1/payment_methods", tags=["payment_methods"]
-)
+app.include_router(wallets_router, prefix="/api/v1/wallets", tags=["wallets"])
 app.include_router(users_router, prefix="/api/v1/users", tags=["users"])
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
 

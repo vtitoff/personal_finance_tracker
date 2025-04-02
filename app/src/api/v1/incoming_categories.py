@@ -3,10 +3,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_pagination import Page, paginate
-from schemas.income_category import (CreateIncomeCategorySchema,
-                                     GetIncomeCategorySchema)
-from services.category_service import (IncomeCategoryService,
-                                       get_income_category_service)
+from schemas.incoming_category import (CreateIncomingCategorySchema,
+                                       GetIncomingCategorySchema)
+from services.category_service import (IncomingCategoryService,
+                                       get_incoming_category_service)
 from services.exceptions import (ConflictError, ObjectAlreadyExistsException,
                                  ObjectNotFoundError)
 from utils.auth import (check_admin_access, check_user_access, decode_token,
@@ -15,19 +15,19 @@ from utils.auth import (check_admin_access, check_user_access, decode_token,
 router = APIRouter()
 
 
-@router.get("/", response_model=Page[GetIncomeCategorySchema])
+@router.get("/", response_model=Page[GetIncomingCategorySchema])
 async def get_categories(
-    category_service: IncomeCategoryService = Depends(get_income_category_service),
-) -> Page[GetIncomeCategorySchema]:
+    category_service: IncomingCategoryService = Depends(get_incoming_category_service),
+) -> Page[GetIncomingCategorySchema]:
     categories = await category_service.get_all_categories()
     return paginate(categories)
 
 
-@router.get("/{category_id}", response_model=GetIncomeCategorySchema)
+@router.get("/{category_id}", response_model=GetIncomingCategorySchema)
 async def get_categories(
     category_id: str,
-    category_service: IncomeCategoryService = Depends(get_income_category_service),
-) -> GetIncomeCategorySchema:
+    category_service: IncomingCategoryService = Depends(get_incoming_category_service),
+) -> GetIncomingCategorySchema:
     try:
         category = await category_service.get_category_by_id(category_id)
         return category
@@ -35,11 +35,11 @@ async def get_categories(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
 
 
-@router.post("/", response_model=GetIncomeCategorySchema)
+@router.post("/", response_model=GetIncomingCategorySchema)
 async def create_categories(
-    category: CreateIncomeCategorySchema,
-    category_service: IncomeCategoryService = Depends(get_income_category_service),
-) -> GetIncomeCategorySchema:
+    category: CreateIncomingCategorySchema,
+    category_service: IncomingCategoryService = Depends(get_incoming_category_service),
+) -> GetIncomingCategorySchema:
     try:
         category = await category_service.create_category(category)
         return category
@@ -50,13 +50,13 @@ async def create_categories(
         )
 
 
-@router.patch("/", response_model=GetIncomeCategorySchema)
+@router.patch("/", response_model=GetIncomingCategorySchema)
 async def update_category(
     category_id: str,
     access_token: Annotated[str, Depends(oauth2_scheme)],
-    category: CreateIncomeCategorySchema,
-    category_service: IncomeCategoryService = Depends(get_income_category_service),
-) -> GetIncomeCategorySchema:
+    category: CreateIncomingCategorySchema,
+    category_service: IncomingCategoryService = Depends(get_incoming_category_service),
+) -> GetIncomingCategorySchema:
     try:
 
         payload = decode_token(access_token)
@@ -84,7 +84,7 @@ async def update_category(
 async def delete_category(
     category_id: str,
     access_token: Annotated[str, Depends(oauth2_scheme)],
-    category_service: IncomeCategoryService = Depends(get_income_category_service),
+    category_service: IncomingCategoryService = Depends(get_incoming_category_service),
 ):
     try:
         payload = decode_token(access_token)
