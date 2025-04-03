@@ -73,7 +73,7 @@ class OutgoingTransactionService(AbstractTransactionService):
             transaction = stmt.first()
 
             if transaction is None:
-                raise ObjectNotFoundError("Transaction not found")
+                raise ObjectNotFoundError("Transaction not found!")
 
             for field in data.model_fields_set:
                 field_value = getattr(data, field)
@@ -92,7 +92,7 @@ class OutgoingTransactionService(AbstractTransactionService):
             transaction = stmt.first()
 
             if transaction is None:
-                raise ObjectNotFoundError("Transaction not found")
+                raise ObjectNotFoundError("Transaction not found!")
 
             await session.delete(transaction)
             await session.commit()
@@ -106,7 +106,7 @@ class OutgoingTransactionService(AbstractTransactionService):
             transaction = stmt.first()
 
             if transaction is None:
-                raise ObjectNotFoundError("Transaction not found")
+                raise ObjectNotFoundError("Transaction not found!")
 
             return transaction
 
@@ -118,7 +118,7 @@ class OutgoingTransactionService(AbstractTransactionService):
             transactions = stmt.all()
 
             if transactions is None:
-                raise ObjectNotFoundError("Transactions not found")
+                raise ObjectNotFoundError("Transactions not found!")
 
             return transactions
 
@@ -162,7 +162,7 @@ class IncomingTransactionService(AbstractTransactionService):
             transaction = stmt.first()
 
             if transaction is None:
-                raise ObjectNotFoundError("Transaction not found")
+                raise ObjectNotFoundError("Transaction not found!")
 
             for field in data.model_fields_set:
                 field_value = getattr(data, field)
@@ -181,7 +181,7 @@ class IncomingTransactionService(AbstractTransactionService):
             transaction = stmt.first()
 
             if transaction is None:
-                raise ObjectNotFoundError("Transaction not found")
+                raise ObjectNotFoundError("Transaction not found!")
 
             await session.delete(transaction)
             await session.commit()
@@ -195,7 +195,7 @@ class IncomingTransactionService(AbstractTransactionService):
             transaction = stmt.first()
 
             if transaction is None:
-                raise ObjectNotFoundError("Transaction not found")
+                raise ObjectNotFoundError("Transaction not found!")
 
             return transaction
 
@@ -207,7 +207,7 @@ class IncomingTransactionService(AbstractTransactionService):
             transactions = stmt.all()
 
             if transactions is None:
-                raise ObjectNotFoundError("Transactions not found")
+                raise ObjectNotFoundError("Transactions not found!")
 
             return transactions
 

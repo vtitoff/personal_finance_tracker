@@ -6,6 +6,7 @@ from api.v1.incoming_categories import router as incoming_categories_router
 from api.v1.incoming_transactions import router as incoming_transactions_router
 from api.v1.outgoing_categories import router as outgoing_categories_router
 from api.v1.outgoing_transactions import router as outgoing_transactions_router
+from api.v1.roles import router as roles_router
 from api.v1.users import router as users_router
 from api.v1.wallets import router as wallets_router
 from core.config import settings
@@ -61,6 +62,7 @@ app.include_router(
 )
 app.include_router(wallets_router, prefix="/api/v1/wallets", tags=["wallets"])
 app.include_router(users_router, prefix="/api/v1/users", tags=["users"])
+app.include_router(roles_router, prefix="/api/v1/roles", tags=["roles"])
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
 
 add_pagination(app)

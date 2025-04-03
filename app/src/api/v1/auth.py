@@ -8,6 +8,7 @@ from schemas.user import CreateUserSchema
 from services.auth_service import AuthService, get_auth_service
 from services.exceptions import (ObjectAlreadyExistsException,
                                  ObjectNotFoundError)
+from services.role_service import RoleService, get_role_service
 from services.user_service import UserService, get_user_service
 from utils.auth import decode_token
 
@@ -143,6 +144,7 @@ async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     auth_service: AuthService = Depends(get_auth_service),
     user_service: UserService = Depends(get_user_service),
+    roles_service: RoleService = Depends(get_role_service),
 ) -> AuthOutputSchema:
     try:
         user = await user_service.get_user_by_login(form_data.username)
@@ -154,7 +156,7 @@ async def login(
 
         # await user_service.save_login_history(user_id) TODO
 
-        user_roles = [x.title for x in await user_service.get_user_roles(user_id)]
+        user_roles = [x.title for x in await roles_service.get_user_roles(user_id)]
 
         access_token = await auth_service.generate_access_token(user_id, user_roles)
         refresh_token = await auth_service.generate_refresh_token(user_id)

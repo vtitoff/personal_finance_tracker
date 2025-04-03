@@ -36,7 +36,7 @@ class UserService:
             user = stmt.first()
 
             if user is None:
-                raise ObjectNotFoundError("User not found")
+                raise ObjectNotFoundError("User not found!")
 
             return user
 
@@ -47,7 +47,7 @@ class UserService:
             user = stmt.first()
 
             if user is None:
-                raise ObjectNotFoundError("User not found")
+                raise ObjectNotFoundError("User not found!")
 
             return user
 
@@ -75,20 +75,10 @@ class UserService:
             user = stmt.first()
 
             if user is None:
-                raise ObjectNotFoundError("User not found")
+                raise ObjectNotFoundError("User not found!")
 
             await session.delete(user)
             await session.commit()
-
-    async def get_user_roles(self, user_id: str):
-        async with self.postgres_session() as session:
-            stmt = await session.scalars(select(User).filter_by(id=user_id))
-            user = stmt.first()
-
-            if user is None:
-                raise ObjectNotFoundError("User not found")
-
-            return user.roles
 
 
 def get_user_service(
