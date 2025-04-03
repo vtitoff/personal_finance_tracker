@@ -32,3 +32,7 @@
 - JWT-токены
     
 - PostgreSQL
+
+
+### Создание админа
+docker exec app python superuser.py {LOGIN} {PASSWORD}
