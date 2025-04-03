@@ -1,16 +1,20 @@
+from datetime import datetime
+from uuid import UUID
+
 from pydantic import BaseModel
 from schemas.mixins import IdMixin
 
 
 class OutgoingTransaction(BaseModel):
-    amount: str
+    amount: int
     description: str
-    category_id: str
-    wallet_id: str
-    user_id: str
+    category_id: UUID
+    wallet_id: UUID
+    user_id: UUID
+    date: datetime | None = None
 
 
-class CreateOutgoingTransactionSchema(IdMixin, OutgoingTransaction):
+class CreateOutgoingTransactionSchema(OutgoingTransaction):
     pass
 
 

@@ -2,9 +2,12 @@ from abc import ABC, abstractmethod
 
 from db.postgres import get_postgres_session
 from fastapi import Depends
-from models import IncomingTransaction, OutgoingTransaction
-from services.exceptions import (ConflictError, ObjectAlreadyExistsException,
-                                 ObjectNotFoundError)
+from models import IncomingTransaction, OutgoingTransaction, Wallet
+from schemas.incoming_transaction import (CreateIncomingTransactionSchema,
+                                          UpdateIncomingTransactionSchema)
+from schemas.outgoing_transaction import (CreateOutgoingTransactionSchema,
+                                          UpdateOutgoingTransactionSchema)
+from services.exceptions import ConflictError, ObjectNotFoundError
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,26 +39,32 @@ class OutgoingTransactionService(AbstractTransactionService):
     def __init__(self, postgres_session: AsyncSession):
         self.postgres_session = postgres_session
 
-    async def create_transaction(self, data):
+    async def create_transaction(self, data: CreateOutgoingTransactionSchema):
         transaction = OutgoingTransaction(
             amount=data.amount,
             description=data.description,
-            date=data.date,
             category_id=data.category_id,
             wallet_id=data.wallet_id,
             user_id=data.user_id,
         )
+        if data.date:
+            transaction.date = data.date
 
         async with self.postgres_session() as session:
-            try:
+            async with session.begin():
+                stmt = await session.scalars(
+                    select(Wallet).filter_by(id=transaction.wallet_id)
+                )
+                wallet = stmt.first()
+                if wallet is None:
+                    raise ObjectNotFoundError("Wallet not found!")
+                wallet.amount -= transaction.amount
                 session.add(transaction)
-                await session.commit()
-                await session.refresh(transaction)
-                return transaction
-            except IntegrityError:
-                raise ObjectAlreadyExistsException
+            return transaction
 
-    async def update_transaction(self, transaction_id, data):
+    async def update_transaction(
+        self, transaction_id, data: UpdateOutgoingTransactionSchema
+    ):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
                 select(OutgoingTransaction).filter_by(id=transaction_id)
@@ -75,7 +84,7 @@ class OutgoingTransactionService(AbstractTransactionService):
                 raise ConflictError("ConflictError")
             return transaction
 
-    async def delete_transaction(self, transaction_id):
+    async def delete_transaction(self, transaction_id: str):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
                 select(OutgoingTransaction).filter_by(id=transaction_id)
@@ -88,7 +97,7 @@ class OutgoingTransactionService(AbstractTransactionService):
             await session.delete(transaction)
             await session.commit()
 
-    async def get_transaction_by_id(self, transaction_id):
+    async def get_transaction_by_id(self, transaction_id: str):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
                 select(OutgoingTransaction).filter_by(id=transaction_id)
@@ -101,7 +110,7 @@ class OutgoingTransactionService(AbstractTransactionService):
 
             return transaction
 
-    async def get_user_transactions(self, user_id):
+    async def get_user_transactions(self, user_id: str):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
                 select(OutgoingTransaction).filter_by(user_id=user_id)
@@ -118,26 +127,33 @@ class IncomingTransactionService(AbstractTransactionService):
     def __init__(self, postgres_session: AsyncSession):
         self.postgres_session = postgres_session
 
-    async def create_transaction(self, data):
+    async def create_transaction(self, data: CreateIncomingTransactionSchema):
         transaction = IncomingTransaction(
             amount=data.amount,
             description=data.description,
-            date=data.date,
             category_id=data.category_id,
             wallet_id=data.wallet_id,
             user_id=data.user_id,
         )
 
-        async with self.postgres_session() as session:
-            try:
-                session.add(transaction)
-                await session.commit()
-                await session.refresh(transaction)
-                return transaction
-            except IntegrityError:
-                raise ObjectAlreadyExistsException
+        if data.date:
+            transaction.date = data.date
 
-    async def update_transaction(self, transaction_id, data):
+        async with self.postgres_session() as session:
+            async with session.begin():
+                stmt = await session.scalars(
+                    select(Wallet).filter_by(id=transaction.wallet_id)
+                )
+                wallet = stmt.first()
+                if wallet is None:
+                    raise ObjectNotFoundError("Wallet not found!")
+                wallet.amount += transaction.amount
+                session.add(transaction)
+            return transaction
+
+    async def update_transaction(
+        self, transaction_id: str, data: UpdateIncomingTransactionSchema
+    ):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
                 select(IncomingTransaction).filter_by(id=transaction_id)
@@ -157,7 +173,7 @@ class IncomingTransactionService(AbstractTransactionService):
                 raise ConflictError("ConflictError")
             return transaction
 
-    async def delete_transaction(self, transaction_id):
+    async def delete_transaction(self, transaction_id: str):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
                 select(IncomingTransaction).filter_by(id=transaction_id)
@@ -170,7 +186,7 @@ class IncomingTransactionService(AbstractTransactionService):
             await session.delete(transaction)
             await session.commit()
 
-    async def get_transaction_by_id(self, transaction_id):
+    async def get_transaction_by_id(self, transaction_id: str):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
                 select(IncomingTransaction).filter_by(id=transaction_id)
@@ -183,7 +199,7 @@ class IncomingTransactionService(AbstractTransactionService):
 
             return transaction
 
-    async def get_user_transactions(self, user_id):
+    async def get_user_transactions(self, user_id: str):
         async with self.postgres_session() as session:
             stmt = await session.scalars(
                 select(IncomingTransaction).filter_by(user_id=user_id)
