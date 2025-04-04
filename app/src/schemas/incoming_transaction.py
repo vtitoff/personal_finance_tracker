@@ -10,7 +10,7 @@ class IncomingTransaction(BaseModel):
     description: str
     category_id: UUID
     wallet_id: UUID
-    user_id: UUID
+    user_id: UUID | None = None
     date: datetime | None = None
 
 

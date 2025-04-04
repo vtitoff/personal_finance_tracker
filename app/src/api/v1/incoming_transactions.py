@@ -10,6 +10,7 @@ from services.exceptions import (ConflictError, ObjectAlreadyExistsException,
                                  ObjectNotFoundError)
 from services.transaction_service import (IncomingTransactionService,
                                           get_incoming_transaction_service)
+from services.wallet_service import WalletService, get_wallet_service
 from sqlalchemy.exc import DBAPIError
 from utils.auth import check_user_access, decode_token, oauth2_scheme
 
@@ -23,6 +24,7 @@ async def create_transaction(
     transaction_service: IncomingTransactionService = Depends(
         get_incoming_transaction_service
     ),
+    wallet_service: WalletService = Depends(get_wallet_service),
 ) -> GetIncomingTransactionSchema:
     try:
         payload = decode_token(access_token)
@@ -32,7 +34,10 @@ async def create_transaction(
                 status_code=HTTPStatus.UNAUTHORIZED, detail="invalid token"
             )
 
-        check_user_access(payload, str(transaction.user_id))
+        wallet = await wallet_service.get_wallet_by_id(str(transaction.wallet_id))
+        check_user_access(payload, str(wallet.user_id))
+
+        transaction.user_id = wallet.user_id
 
         transaction = await transaction_service.create_transaction(transaction)
         return transaction
@@ -51,6 +56,7 @@ async def update_transaction(
     transaction_service: IncomingTransactionService = Depends(
         get_incoming_transaction_service
     ),
+    wallet_service: WalletService = Depends(get_wallet_service),
 ) -> GetIncomingTransactionSchema:
     try:
         payload = decode_token(access_token)
@@ -60,7 +66,10 @@ async def update_transaction(
                 status_code=HTTPStatus.UNAUTHORIZED, detail="invalid token"
             )
 
-        check_user_access(payload, str(transaction.user_id))
+        wallet = await wallet_service.get_wallet_by_id(str(transaction.wallet_id))
+        check_user_access(payload, str(wallet.user_id))
+
+        transaction.user_id = wallet.user_id
 
         updated_transaction = await transaction_service.update_transaction(
             transaction_id, transaction
@@ -118,7 +127,7 @@ async def get_transactions_by_user_id(
 
         check_user_access(payload, user_id)
 
-        transactions = await transaction_service.get_transactions_by_user_id(user_id)
+        transactions = await transaction_service.get_user_transactions(user_id)
         return paginate(transactions)
     except (ObjectNotFoundError, DBAPIError):
         raise HTTPException(

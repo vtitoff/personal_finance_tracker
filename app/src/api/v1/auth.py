@@ -19,6 +19,7 @@ router = APIRouter()
 async def signup(
     user: CreateUserSchema,
     user_service: UserService = Depends(get_user_service),
+    roles_service: RoleService = Depends(get_role_service),
     auth_service: AuthService = Depends(get_auth_service),
 ) -> AuthOutputSchema:
     try:
@@ -31,7 +32,7 @@ async def signup(
 
     user_id = str(user.id)
 
-    user_roles = [role.title for role in await user_service.get_user_roles(user_id)]
+    user_roles = [role.title for role in await roles_service.get_user_roles(user_id)]
 
     access_token = await auth_service.generate_access_token(user_id, user_roles)
     refresh_token = await auth_service.generate_refresh_token(user_id)
@@ -46,6 +47,7 @@ async def signup(
 async def refresh(
     request_data: RefreshInputSchema,
     auth_service: AuthService = Depends(get_auth_service),
+    roles_service: RoleService = Depends(get_role_service),
     user_service: UserService = Depends(get_user_service),
 ) -> AuthOutputSchema:
 
@@ -62,7 +64,7 @@ async def refresh(
 
     user_id = refresh_token_data["user_id"]
 
-    user_roles = [x.title for x in await user_service.get_user_roles(user_id)]
+    user_roles = [x.title for x in await roles_service.get_user_roles(user_id)]
 
     refresh_token, access_token = await auth_service.update_refresh_token(
         user_id,
@@ -80,6 +82,7 @@ async def refresh(
 async def login(
     login_data: LoginInputSchema,
     auth_service: AuthService = Depends(get_auth_service),
+    roles_service: RoleService = Depends(get_role_service),
     user_service: UserService = Depends(get_user_service),
 ) -> AuthOutputSchema:
     try:
@@ -92,7 +95,7 @@ async def login(
 
         # await user_service.save_login_history(user_id) TODO
 
-        user_roles = [x.title for x in await user_service.get_user_roles(user_id)]
+        user_roles = [x.title for x in await roles_service.get_user_roles(user_id)]
 
         access_token = await auth_service.generate_access_token(user_id, user_roles)
         refresh_token = await auth_service.generate_refresh_token(user_id)
