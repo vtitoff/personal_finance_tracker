@@ -1,0 +1,67 @@
+services:
+  finance_app:
+    build:
+      dockerfile: Dockerfile
+      context: ./app
+    container_name: app_test
+    env_file:
+      - app/src/.test.env
+    restart: always
+    networks:
+      - finance_app_test_network
+    volumes:
+      - ./app/src:/opt/app/src
+      - ./app/logs/:/var/log/app/
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  nginx:
+    container_name: nginx_test
+    build:
+      context: ./nginx/.
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/site.conf:/etc/nginx/conf.d/site.conf
+      - ./nginx/logs/:/var/log/nginx/
+    depends_on:
+      - finance_app
+    ports:
+      - "80:80"
+    networks:
+      - finance_app_test_network
+
+  postgres:
+    image: postgres:16
+    container_name: postgres_test
+    volumes:
+      - postgres_data_test:/var/lib/postgresql/data
+    restart: always
+    env_file: app/src/.test.env
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h localhost -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    networks:
+      - finance_app_test_network
+
+  redis:
+    image: redis:latest
+    container_name: users_redis_test
+    restart: always
+    volumes:
+      - ./test_redis_data:/data
+      - ./test_redis.conf:/usr/local/etc/redis/redis.conf
+    env_file:
+      - app/src/.test.env
+
+networks:
+  finance_app_test_network:
+
+volumes:
+  postgres_data_test:

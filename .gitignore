@@ -9,6 +9,9 @@ venv
 .ruff_cache/
 .mypy_cache/
 .env
+.test.env
 .pytest_cache/
 redis_data/
 redis.conf
+test_redis_data/
+test_redis.conf
