@@ -1,12 +1,19 @@
 from http import HTTPStatus
-from typing import Any
+from typing import Any, List
 
 import jwt
 from core.config import settings
 from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer
+from pydantic import BaseModel
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
+
+
+class AccessTokenPayload(BaseModel):
+    user_id: str
+    exp: int
+    roles: List[str]
 
 
 def decode_token(token: str) -> dict[str, Any] | None:

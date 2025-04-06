@@ -9,6 +9,7 @@ from models import RefreshToken
 from redis import Redis
 from sqlalchemy import delete, exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from utils.auth import AccessTokenPayload
 
 
 class AuthService:
@@ -18,14 +19,14 @@ class AuthService:
 
     async def generate_access_token(self, user_id: str, user_roles: list[str]):
         valid_till = datetime.now() + timedelta(hours=settings.access_token_exp_hours)
-        payload = {
-            "user_id": user_id,
-            "exp": int(valid_till.timestamp()),
-            "roles": user_roles,
-        }
+        payload = AccessTokenPayload(
+            user_id=user_id, user_roles=user_roles, exp=int(valid_till.timestamp())
+        )
 
         return jwt.encode(
-            payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm
+            payload.model_dump(),
+            settings.jwt_secret_key,
+            algorithm=settings.jwt_algorithm,
         )
 
     async def generate_refresh_token(self, user_id: str):
