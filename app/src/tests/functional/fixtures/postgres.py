@@ -19,10 +19,9 @@ async def engine():
 @pytest_asyncio.fixture
 async def db_session(engine):
     async with engine.connect() as conn:
-        transaction = await conn.begin()
         session = async_sessionmaker(
             bind=conn, expire_on_commit=False, class_=AsyncSession
         )()
         yield session
         await session.close()
-        await transaction.rollback()
+        await session.rollback()
