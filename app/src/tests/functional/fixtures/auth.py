@@ -8,10 +8,11 @@ from tests.functional.settings import settings
 from utils.auth import AccessTokenPayload
 
 
-def auth_header(user_roles: List[str]) -> dict[str, str]:
+def auth_header(user_roles: List[str], user_id: str = None) -> dict[str, str]:
+    user_id = user_id or str(uuid4())
     valid_till = datetime.now() + timedelta(hours=settings.access_token_exp_hours)
     payload = AccessTokenPayload(
-        user_id=str(uuid4()), roles=user_roles, exp=int(valid_till.timestamp())
+        user_id=user_id, roles=user_roles, exp=int(valid_till.timestamp())
     )
 
     token = jwt.encode(
