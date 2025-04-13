@@ -5,7 +5,7 @@ from models import User
 from tests.functional.fixtures.postgres import db_session
 
 
-@pytest_asyncio.fixture(loop_scope="session")
+@pytest_asyncio.fixture(loop_scope="function")
 async def create_users(db_session):
     users = []
     for i in range(3):

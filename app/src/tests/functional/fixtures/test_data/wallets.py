@@ -6,7 +6,7 @@ from tests.functional.fixtures.postgres import db_session
 from tests.functional.fixtures.test_data.users import create_users
 
 
-@pytest_asyncio.fixture(loop_scope="session")
+@pytest_asyncio.fixture(loop_scope="function")
 async def create_wallets(db_session, create_users):
     wallets = []
     for user in create_users:

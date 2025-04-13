@@ -8,7 +8,7 @@ from tests.functional.fixtures.test_data.categories import (
 from tests.functional.fixtures.test_data.wallets import create_wallets
 
 
-@pytest_asyncio.fixture(loop_scope="session")
+@pytest_asyncio.fixture(loop_scope="function")
 async def create_outgoing_transactions(
     db_session, create_outgoing_categories, create_wallets
 ):

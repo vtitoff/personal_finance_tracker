@@ -5,7 +5,7 @@ from main import app
 from tests.functional.settings import settings
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(loop_scope="function")
 async def client(db_session):
     async def override_get_db():
         yield db_session

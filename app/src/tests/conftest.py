@@ -1,3 +1,16 @@
+import asyncio
+
+import pytest_asyncio
+
+
+@pytest_asyncio.fixture(scope="session")
+async def event_loop():
+    loop = asyncio.get_event_loop()
+    yield loop
+    loop.stop()
+    loop.close()
+
+
 pytest_plugins = [
     "tests.functional.fixtures.postgres",
     "tests.functional.fixtures.redis",

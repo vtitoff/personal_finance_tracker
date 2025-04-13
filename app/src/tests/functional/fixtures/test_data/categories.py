@@ -3,7 +3,7 @@ from models import IncomingCategory, OutgoingCategory
 from tests.functional.fixtures.postgres import db_session
 
 
-@pytest_asyncio.fixture(loop_scope="session")
+@pytest_asyncio.fixture(loop_scope="function")
 async def create_outgoing_categories(db_session):
     categories = []
     for i in range(10):
@@ -17,7 +17,7 @@ async def create_outgoing_categories(db_session):
     return categories
 
 
-@pytest_asyncio.fixture(loop_scope="session")
+@pytest_asyncio.fixture(loop_scope="function")
 async def create_incoming_categories(db_session):
     categories = []
     for i in range(10):

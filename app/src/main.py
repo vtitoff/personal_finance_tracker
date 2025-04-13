@@ -23,8 +23,16 @@ from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
 async def lifespan(app: FastAPI):
     try:
         redis.redis = Redis(host=settings.redis_host, port=settings.redis_port)
+        connect_args = (
+            {}
+            if settings.prepared_statement_cache_enabled
+            else {"prepared_statement_cache_size": 0}
+        )
         postgres.engine = create_async_engine(
-            postgres.dsn, echo=settings.engine_echo, future=True
+            postgres.dsn,
+            echo=settings.engine_echo,
+            future=True,
+            connect_args=connect_args,
         )
         postgres.async_session = async_sessionmaker(bind=postgres.engine, expire_on_commit=False, class_=AsyncSession)  # type: ignore[assignment]
         yield

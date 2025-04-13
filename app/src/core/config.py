@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     jwt_algorithm: str = Field("HS256", alias="JWT_ALGORITHM")
     redis_port: str = Field("6379", alias="REDIS_PORT")
     redis_host: str = Field("redis", alias="REDIS_HOST")
+    prepared_statement_cache_enabled: bool = Field(
+        True, alias="PREPARED_STATEMENT_CACHE_ENABLED"
+    )
 
 
 settings = Settings()

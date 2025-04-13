@@ -24,11 +24,11 @@ def auth_header(user_roles: List[str], user_id: str = None) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}"}
 
 
-@pytest_asyncio.fixture(loop_scope="session")
+@pytest_asyncio.fixture(loop_scope="function")
 async def access_token_user() -> dict:
     return auth_header(["user"])
 
 
-@pytest_asyncio.fixture(loop_scope="session")
+@pytest_asyncio.fixture(loop_scope="function")
 async def access_token_admin() -> dict:
     return auth_header(["admin"])
